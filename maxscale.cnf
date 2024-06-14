@@ -1,0 +1,44 @@
+[maxscale]
+threads=auto
+
+# Define the servers
+[server1]
+type=server
+address=mariadb1
+port=3306
+protocol=MariaDBBackend
+
+[server2]
+type=server
+address=mariadb2
+port=3306
+protocol=MariaDBBackend
+
+[server3]
+type=server
+address=mariadb3
+port=3306
+protocol=MariaDBBackend
+
+# Define the Monitor
+[Galera Monitor]
+type=monitor
+module=galeramon
+servers=server1,server2,server3
+user=${MARIADB_USER_1}
+password=${MARIADB_PASSWORD_1}
+
+# Define the Service
+[RW Split Router]
+type=service
+router=readwritesplit
+servers=server1,server2,server3
+user=${MARIADB_USER_1}
+password=${MARIADB_PASSWORD_1}
+
+# Define the Listener
+[RW Split Listener]
+type=listener
+service=RW Split Router
+protocol=MariaDBClient
+port=4006

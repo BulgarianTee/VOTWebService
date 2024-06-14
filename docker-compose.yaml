@@ -1,0 +1,80 @@
+version: "3"
+services:
+  # mariadb-1
+  mariadb1:
+    image: mariadb:10.5
+    container_name: mariadb1
+    ports:
+      - "3306:3306"
+    env_file: .env
+    environment:
+      - MARIADB_USER=${MARIADB_USER_1}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD_1}
+      - MARIADB_DATABASE=${MARIADB_DATABASE_1}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - ./mariadb1/galera.cnf:/etc/mysql/mariadb.conf.d/galera.cnf
+    cap_add:
+      - all
+    networks:
+      - mariadb
+
+  # mariadb-2
+  mariadb2:
+    image: mariadb:10.5
+    container_name: mariadb2
+    ports:
+      - "3307:3306"
+    env_file: .env
+    environment:
+      - MARIADB_USER=${MARIADB_USER_2}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD_2}
+      - MARIADB_DATABASE=${MARIADB_DATABASE_2}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - ./mariadb2/galera.cnf:/etc/mysql/mariadb.conf.d/galera.cnf
+    cap_add:
+      - all
+    networks:
+      - mariadb
+
+  # mariadb-3
+  mariadb3:
+    image: mariadb:10.5
+    container_name: mariadb3
+    ports:
+      - "3308:3306"
+    env_file: .env
+    environment:
+      - MARIADB_USER=${MARIADB_USER_3}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD_3}
+      - MARIADB_DATABASE=${MARIADB_DATABASE_3}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - ./mariadb3/galera.cnf:/etc/mysql/mariadb.conf.d/galera.cnf
+    cap_add:
+      - all
+    networks:
+      - mariadb
+
+  # MaxScale
+  maxscale:
+    image: mariadb/maxscale:latest
+    container_name: maxscale
+    ports:
+      - "4006:4006"
+    environment:
+      - MAXSCALE_USER=maxuser
+      - MAXSCALE_PASSWORD=maxpwd
+    volumes:
+      - ./maxscale.cnf:/etc/maxscale.cnf
+    depends_on:
+      - mariadb1
+      - mariadb2
+      - mariadb3
+    networks:
+      - mariadb
+
+networks:
+  mariadb:
+    driver: bridge
